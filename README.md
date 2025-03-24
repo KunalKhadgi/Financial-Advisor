@@ -1,18 +1,18 @@
 Overview
 This API provides functionalities for credit risk assessment, transaction categorization, and AI-based financial insights. It leverages FastAPI for API development, machine learning models for financial predictions, and a transformer-based language model for financial insights.
 
-**FEATURES**
+**FEATURE**
 _1. Credit Risk Prediction:_
 
-     Uses a Random Forest model to predict a user's credit risk based on their financial data.
+Uses a Random Forest model to predict a user's credit risk based on their financial data.
 
-_2. Transaction Categorization:_
+**FEATURE**_2. Transaction Categorization:_
 
    Uses an NLP model to classify financial transactions into predefined categories.
 
-_3. AI-Based Financial Insights:_
+**FEATURE**_3. AI-Based Financial Insights:_
 
-   Utilizes the **facebook/opt-1.3b** LLM to generate personalized financial insights and recommendations.
+   _Utilizes the **facebook/opt-1.3b** LLM to generate personalized financial insights and recommendations._
 
 Project Structure
 ```
@@ -30,8 +30,6 @@ Project Structure
 Prerequisites**
 
 Python 3.8+: Ensure Python 3.8 or higher is installed.
-
-pip: Python package installer.
 
 _Install Dependencies_
 Run the following command to install all the required dependencies:
@@ -51,11 +49,11 @@ This will start the API locally on http://127.0.0.1:8080.
 
 _API Endpoints_
 
-* Home (GET /):
+* ```Home (GET /):```
 
 Returns a simple welcome message to confirm the API is running.
 
-* Predict Credit Risk (POST /predict-credit-risk):
+* ```Predict Credit Risk (POST /predict-credit-risk):```
 
 Input: JSON data with financial fields.
 
@@ -71,7 +69,7 @@ Example Request:
 ```
 Output: Predicted credit risk category (e.g., "High", "Moderate", "Low").
 
-* Categorize Transaction (POST /categorize-transaction):
+* ```Categorize Transaction (POST /categorize-transaction):```
 
 Input: A JSON body with a transaction description.
 
@@ -103,10 +101,6 @@ Output: Personalized financial insights and recommendations.
  API_KEY = your_api_key
  
 
-plaintext
-Copy
-Edit
-API_KEY=your_secure_api_key
 License
 This project is licensed under the MIT License.
 
