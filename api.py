@@ -12,15 +12,22 @@ load_dotenv()
 API_KEY = os.getenv("API_KEY")
 
 # Load Open-Source LLM (Falcon)
-llm_pipeline = pipeline("text-generation", model="tiiuae/falcon-7b-instruct")
+llm_pipeline = pipeline("text-generation", model="facebook/opt-1.3b") 
 
 # Initialize FastAPI
 app = FastAPI()
 
 # Verify API Key
-def verify_api_key(api_key: str = Header(None)):
+def verify_api_key(request: Request):
+
+    api_key = request.headers.get('x-api-key')
+
+    if api_key is None:
+        raise HTTPException(status_code=400, detail="API Key missing in headers")
+
     if api_key != API_KEY:
-        raise HTTPException(status_code=403, detail="invalid api")
+        raise HTTPException(status_code=403, detail="Invalid API Key")
+
     return api_key
 
 # Load models
@@ -42,36 +49,33 @@ class TransactionRequest(BaseModel):
 
 ######################################### API Endpoints ############################################
 @app.get("/")
-def home():
-    return {"message": "Welcome to the CredArtha API"}
+async def home(request: Request):
+
+    return {"message": "Loaded correctly home page"}
 
 
 @app.post("/predict-credit-risk")
-async def predict_credit_risk(request: Request, api_key: str = Header(None)):
-    """Validates API key and predicts credit risk"""
+async def predict_credit_risk(
+    request: Request, 
+    api_key: str = Depends(verify_api_key)
+):
 
-    print("\n📌 FULL REQUEST HEADERS:", request.headers)  # Debugging
-
-    # Debugging: Print received API key
-    print(f"📌 Received API Key: [{api_key}]")  # THIS NOW WORKS CORRECTLY
-    print(f"✅ Expected API Key: [{API_KEY}]")  # Debugging
-
-     # ✅ Extract JSON input from request
+     # Extract JSON input from request
     data = await request.json()
 
-    # ✅ Ensure required fields exist
+    # Ensure required fields exist
     required_fields = ["credit_score", "missed_payments", "total_outstanding_debt", "debt_to_income_ratio"]
     for field in required_fields:
         if field not in data:
             raise HTTPException(status_code=400, detail=f"Missing required field: {field}")
 
-    # ✅ Convert JSON input to Pandas DataFrame
+    # Prepare input data for model
     input_data = {
-    "Credit_Score": data["credit_score"],  
-    "Debt_to_Income_Ratio": data["debt_to_income_ratio"],
-    "Missed_Payments": data["missed_payments"],
-    "Total_Debt": data["total_outstanding_debt"],
-    "Existing_Loans": data["credit_score"]  
+    "Credit_Score": data["credit_score"],                            # Anywhere between 300 - 900 
+    "Debt_to_Income_Ratio": data["debt_to_income_ratio"],            # 0 - 4
+    "Missed_Payments": data["missed_payments"],                      # 0 - 12
+    "Total_Debt": data["total_outstanding_debt"],                    # 40,000 - 5,00,000
+    "Existing_Loans": data["credit_score"]                           # 0 - 12
     }
     
     df = pd.DataFrame([input_data])
@@ -86,33 +90,58 @@ async def predict_credit_risk(request: Request, api_key: str = Header(None)):
     return {"risk_level": prediction[0]}
 
 @app.post("/categorize-transaction")
-def categorize_transaction(data: TransactionRequest, api_key: str = Depends(verify_api_key)):
+def categorize_transaction(
+    data: TransactionRequest, api_key: str = Depends(verify_api_key)
+):
     prediction = transaction_model.predict([data.description])
     return {"category": prediction[0]}
 
 @app.post("/generate-financial-insights")
-async def generate_insights(request: Request, api_key: str = Header(None)):
+async def generate_insights(    
+    request: Request, 
+    api_key: str = Depends(verify_api_key)
+):
     """Generate AI-based financial insights using an LLM"""
 
-    # Extract request data
+    # Extract JSON input from request
     data = await request.json()
 
-    if "credit_score" not in data or "transactions" not in data:
-        raise HTTPException(status_code=400, detail="Missing required fields")
+    # Ensure required fields exist
+    required_fields = ["credit_score", "missed_payments", "total_outstanding_debt", "debt_to_income_ratio"]
+    for field in required_fields:
+        if field not in data:
+            raise HTTPException(status_code=400, detail=f"Missing required field: {field}")
 
-    # Generate Prompt
+    # Prepare input data for model
+    input_data = {
+    "Credit_Score": data["credit_score"],                            # Anywhere between 300 - 900 
+    "Debt_to_Income_Ratio": data["debt_to_income_ratio"],            # 0 - 4
+    "Missed_Payments": data["missed_payments"],                      # 0 - 12
+    "Total_Debt": data["total_outstanding_debt"],                    # 40,000 - 5,00,000
+    "Existing_Loans": data["credit_score"]                           # 0 - 12
+    }
+    
+    # Convert input data into DataFrame for prediction
+    df = pd.DataFrame([input_data])
+
+    # Get prediction from the model
+    prediction = credit_risk_model.predict(df)
+
+    # Create financial insight prompt
     prompt = f"""
-    The user has a credit score of {data["credit_score"]} and the following transactions:
-    {data["transactions"]}
+    The user has the following financial details: \n
+    Credit Score: {data["credit_score"]} \n
+    Debt-to-Income Ratio: {data["debt_to_income_ratio"]} \n
+    Missed Payments: {data["missed_payments"]} \n
+    Total Outstanding Debt: {data["total_outstanding_debt"]} \n\n
 
-    Provide:
-    1. A summary of their financial health.
-    2. A risk assessment (high, moderate, low).
-    3. Personalized financial recommendations.
+    Based on the provided information, the model predicts the following credit risk level: {prediction[0]}.\n 
+
+    avoid unnecessary information.
     """
 
     # Generate response from LLM
-    response = llm_pipeline(prompt, max_length=200, do_sample=True)[0]['generated_text']
+    response = llm_pipeline(prompt, max_length=None, max_new_tokens=100, do_sample=True)[0]['generated_text']
 
     return {"financial_insights": response}
 
