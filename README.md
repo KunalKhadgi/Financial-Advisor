@@ -1,78 +1,106 @@
-# Financial-Advisor
-Advises client based on his/her finance data
+Overview
+This API provides functionalities for credit risk assessment, transaction categorization, and AI-based financial insights. It leverages FastAPI for API development, machine learning models for financial predictions, and a transformer-based language model for financial insights.
 
-API provides functionalities for credit risk assessment, transaction categorization, and AI-based financial insights. It leverages FastAPI for API development, machine learning models for financial predictions, and a transformer-based language model for financial insights.
+**FEATURES**
+_1. Credit Risk Prediction:_
 
-Features
+     Uses a Random Forest model to predict a user's credit risk based on their financial data.
 
-Credit Risk Prediction: Uses a Random Forest model to predict a user's credit risk based on financial data.
+_2. Transaction Categorization:_
 
-Transaction Categorization: Uses an NLP model to classify financial transactions into predefined categories.
+   Uses an NLP model to classify financial transactions into predefined categories.
 
-AI-Based Financial Insights: Utilizes a Falcon-7B LLM to generate personalized financial insights.
+_3. AI-Based Financial Insights:_
+
+   Utilizes the **facebook/opt-1.3b** LLM to generate personalized financial insights and recommendations.
 
 Project Structure
+```
+├── api.py                        # FastAPI-based API implementation
+├── data.py                       # Synthetic data generation for transactions and credit reports
+├── models.py                     # ML models for credit risk and transaction categorization
+├── synthetic_transactions.csv     # Generated transactions data
+├── synthetic_credit_report.csv    # Generated credit report data
+├── transaction_categorization_model.pkl  # Saved transaction categorization model
+├── credit_risk_model.pkl          # Saved credit risk model
+├── requirements.txt              # List of project dependencies
+├── .env                          # Environment file for sensitive API keys
+```
+**Installation
+Prerequisites**
 
-├── api.py                # FastAPI-based API implementation
+Python 3.8+: Ensure Python 3.8 or higher is installed.
 
-├── data.py               # Synthetic data generation for transactions and credit reports
+pip: Python package installer.
 
-├── models.py             # ML models for credit risk and transaction categorization
+_Install Dependencies_
+Run the following command to install all the required dependencies:
+```pip install -r requirements.txt```
 
-├── synthetic_transactions.csv  # Generated transactions data
+**Usage
+Running the API**
+To start the FastAPI application, use the following command:
 
-├── synthetic_credit_report.csv # Generated credit report data
+```uvicorn api:app --host 127.0.0.1 --port 8080 --reload```
 
-├── transaction_categorization_model.pkl  # Saved transaction model
+This will start the API locally on http://127.0.0.1:8080.
 
-├── credit_risk_model.pkl  # Saved credit risk model
+_API Endpoints_
 
-**Installation**
+Home (GET /):
 
-  Prerequisites
+Returns a simple welcome message to confirm the API is running.
 
-  Python 3.8+
+Predict Credit Risk (POST /predict-credit-risk):
 
-  pip
+Input: JSON data with financial fields.
 
-**Install Dependencies**
+Example Request:
+```
+{
+  "credit_score": 500,
+  "debt_to_income_ratio": 0.35,
+  "missed_payments": 2,
+  "loan_utilization": 0.4,
+  "total_outstanding_debt": 15000
+}
+```
+Output: Predicted credit risk category (e.g., "High", "Moderate", "Low").
 
-  pip install -r requirements.txt
+Categorize Transaction (POST /categorize-transaction):
 
-Usage
+Input: A JSON body with a transaction description.
 
-**Running the API**
+Example Request:
+```
+{
+  "description": "Payment for electricity bill"
+}
+```
+Output: Predicted category for the transaction (e.g., "utilities", "loan").
 
-  uvicorn api:app --reload
+# Generate Financial Insights (POST /generate-financial-insights):
 
-API will be accessible at http://127.0.0.1:8080
+Input: JSON data with financial details (credit score, debt-to-income ratio, missed payments, etc.).
 
-**API Endpoints**
+Example Request:
+```
+{
+  "credit_score": 500,
+  "debt_to_income_ratio": 0.35,
+  "missed_payments": 2,
+  "total_outstanding_debt": 15000
+}
+```
+Output: Personalized financial insights and recommendations.
 
-  *Home (GET /):*
+## Environment Variables
+# To keep your API key secure, create a .env file and set your API key in it:
 
-    Returns a welcome message.
+plaintext
+Copy
+Edit
+API_KEY=your_secure_api_key
+License
+This project is licensed under the MIT License.
 
-  *Predict Credit Risk (POST /predict-credit-risk):*
-
-    Expects JSON input with credit-related fields.
-
-    Returns predicted credit risk category.
-
-  *Categorize Transaction (POST /categorize-transaction):*
-
-    Takes a transaction description and returns the predicted category.
-
-  *Generate Financial Insights (POST /generate-financial-insights):*
-
-    Uses LLM to generate personalized financial recommendations.
-
-*Environment Variables*
-
-Create a .env file and set your API key:
-
-  API_KEY=your_secure_api_key
-
-**License**
-
-  MIT License
