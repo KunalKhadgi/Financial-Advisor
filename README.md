@@ -14,11 +14,17 @@ AI-Based Financial Insights: Utilizes a Falcon-7B LLM to generate personalized f
 Project Structure
 
 ├── api.py                # FastAPI-based API implementation
+
 ├── data.py               # Synthetic data generation for transactions and credit reports
+
 ├── models.py             # ML models for credit risk and transaction categorization
+
 ├── synthetic_transactions.csv  # Generated transactions data
+
 ├── synthetic_credit_report.csv # Generated credit report data
+
 ├── transaction_categorization_model.pkl  # Saved transaction model
+
 ├── credit_risk_model.pkl  # Saved credit risk model
 
 **Installation**
