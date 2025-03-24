@@ -35,23 +35,27 @@ pip: Python package installer.
 
 _Install Dependencies_
 Run the following command to install all the required dependencies:
-```pip install -r requirements.txt```
+```
+pip install -r requirements.txt
+```
 
 **Usage
 Running the API**
 To start the FastAPI application, use the following command:
 
-```uvicorn api:app --host 127.0.0.1 --port 8080 --reload```
+```
+uvicorn api:app --host 127.0.0.1 --port 8080 --reload
+```
 
 This will start the API locally on http://127.0.0.1:8080.
 
 _API Endpoints_
 
-Home (GET /):
+* Home (GET /):
 
 Returns a simple welcome message to confirm the API is running.
 
-Predict Credit Risk (POST /predict-credit-risk):
+* Predict Credit Risk (POST /predict-credit-risk):
 
 Input: JSON data with financial fields.
 
@@ -67,7 +71,7 @@ Example Request:
 ```
 Output: Predicted credit risk category (e.g., "High", "Moderate", "Low").
 
-Categorize Transaction (POST /categorize-transaction):
+* Categorize Transaction (POST /categorize-transaction):
 
 Input: A JSON body with a transaction description.
 
@@ -94,8 +98,10 @@ Example Request:
 ```
 Output: Personalized financial insights and recommendations.
 
-## Environment Variables
-# To keep your API key secure, create a .env file and set your API key in it:
+# Environment Variables
+ To keep your API key secure, create a .env file and set your API key in it:
+ API_KEY = your_api_key
+ 
 
 plaintext
 Copy
